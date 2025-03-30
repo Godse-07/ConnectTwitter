@@ -2,6 +2,7 @@ import Image from "next/image";
 import NavBar from "./Pages/NavBar";
 import Below_Nav from "./Pages/Below_Nav";
 import { Features_card } from "./Pages/Features_card";
+import Tweets from "./Pages/Tweets";
 
 export default function Home() {
   return (
@@ -19,10 +20,16 @@ export default function Home() {
         <Features_card />
       </div>
 
-      {/* Rest of the content */}
-      <main className="flex justify-center items-center min-h-[500px] text-white">
-        <p className="text-xl">More Content Here</p>
+      {/* main tweets */}
+
+      <main className="flex flex-col items-center justify-center h-auto text-white">
+        <Tweets />
       </main>
+
+      {/* Footer */}
+      <footer className="flex justify-center items-center min-h-[500px] text-white">  
+          <p className="text-xl">Footer</p>
+      </footer>
     </div>
   );
 }
