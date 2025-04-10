@@ -40,7 +40,7 @@ function NavBar() {
   const checkWalletConnection = useCallback(async () => {
     if (window.ethereum) {
       try {
-        const provider = new ethers.BrowserProvider(window.ethereum as any);
+        const provider = new ethers.BrowserProvider(window.ethereum as unknown as ethers.Eip1193Provider);
         const accounts = await provider.send("eth_accounts", []);
         if (accounts.length > 0) {
           setWallet(accounts[0]);
@@ -72,7 +72,7 @@ function NavBar() {
   const connectWallet = async () => {
     if (window.ethereum) {
       try {
-        const provider = new ethers.BrowserProvider(window.ethereum as any);
+        const provider = new ethers.BrowserProvider(window.ethereum as unknown as ethers.Eip1193Provider);
         const accounts = await provider.send("eth_requestAccounts", []);
         setWallet(accounts[0]);
       } catch (error) {
