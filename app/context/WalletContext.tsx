@@ -17,12 +17,15 @@ export const WalletProvider = ({ children }: { children: React.ReactNode }) => {
   const [wallet, setWallet] = useState("");
 
   useEffect(() => {
-    // Auto-check connection
-    if (window.ethereum) {
+    if (typeof window !== "undefined" && (window.ethereum as ethers.Eip1193Provider) && typeof (window.ethereum as ethers.Eip1193Provider).request === "function") {
       const checkConnection = async () => {
-        const provider = new ethers.BrowserProvider(window.ethereum);
-        const accounts = await provider.send("eth_accounts", []);
-        if (accounts.length > 0) setWallet(accounts[0]);
+        try {
+          const provider = new ethers.BrowserProvider(window.ethereum as ethers.Eip1193Provider);
+          const accounts = await provider.send("eth_accounts", []);
+          if (accounts.length > 0) setWallet(accounts[0]);
+        } catch (error) {
+          console.error("Error connecting wallet:", error);
+        }
       };
       checkConnection();
     }
