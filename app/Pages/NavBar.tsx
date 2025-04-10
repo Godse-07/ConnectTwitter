@@ -6,6 +6,8 @@ import React, { useEffect, useState, useRef } from "react";
 import { ethers } from "ethers";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useRouter } from "next/navigation";
+import { useWallet } from "../context/WalletContext";
+
 
 declare global {
   interface Window {
@@ -14,10 +16,11 @@ declare global {
 }
 
 function NavBar() {
-  const [wallet, setWalletAddress] = useState("");
+  const [Wallet, setWalletAddress] = useState("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [showAlert, setShowAlert] = useState(false); // <-- State for Alert
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const { wallet, setWallet } = useWallet();
 
   useEffect(() => {
     checkWalletConnection();
@@ -53,7 +56,7 @@ function NavBar() {
       try {
         const provider = new ethers.BrowserProvider(window.ethereum);
         const accounts = await provider.send("eth_requestAccounts", []);
-        setWalletAddress(accounts[0]);
+        setWallet(accounts[0]); // Update global state
       } catch (error) {
         console.error("Wallet connection error:", error);
       }
@@ -65,15 +68,15 @@ function NavBar() {
   const Router = useRouter();
 
   const profilePage = () =>{
-    if(wallet){
-      Router.push(`/account/${wallet}`);
+    if(Wallet){
+      Router.push(`/account/${Wallet}`);
     }
   }
 
   const handleLogout = () => {
     setWalletAddress("");
     setIsDropdownOpen(false);
-    localStorage.removeItem(wallet); 
+    localStorage.removeItem(Wallet); 
     setShowAlert(true); 
     setTimeout(() => {
       setShowAlert(false);
@@ -103,14 +106,14 @@ function NavBar() {
             <span>Visit Twitter</span>
           </Button>
 
-          {wallet ? (
+          {Wallet ? (
             <div className="relative" ref={dropdownRef}>
               <Button
                 onClick={toggleDropdown}
                 className="text-xl bg-green-600 text-white cursor-pointer flex items-center"
               >
                 <Antenna className="mr-2 h-4 w-4" />
-                <span>{wallet.slice(0, 6) + "..." + wallet.slice(-4)}</span>
+                <span>{Wallet.slice(0, 6) + "..." + Wallet.slice(-4)}</span>
               </Button>
 
               {isDropdownOpen && (

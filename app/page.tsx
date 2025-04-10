@@ -1,35 +1,31 @@
-import Image from "next/image";
 import NavBar from "./Pages/NavBar";
 import Below_Nav from "./Pages/Below_Nav";
 import { Features_card } from "./Pages/Features_card";
 import Tweets from "./Pages/Tweets";
+import Footer from "./Pages/Footer";
 
 export default function Home() {
   return (
-    <div className="bg-gradient-to-b from-[#0F0F0F] via-[#1A1A1A] to-[#050505] min-h-screen w-full">
+    <div className="bg-gradient-to-b from-[#0F0F0F] via-[#1A1A1A] to-[#050505] w-full min-h-screen">
       <NavBar />
 
       {/* Below Navbar Section */}
-      <div className="h-[300px] flex justify-center items-center text-white pt-16">
+      <div className="py-20 flex justify-center items-center text-white pt-16">
         <Below_Nav />
       </div>
 
-      {/* features card */}
-
-      <div className="h-[300px] flex justify-center items-center">
+      {/* Features Card */}
+      <div className="py-20 flex justify-center items-center">
         <Features_card />
       </div>
 
-      {/* main tweets */}
-
-      <main className="flex flex-col items-center justify-center h-auto text-white">
+      {/* Main Tweets */}
+      <main className="flex flex-col items-center justify-center text-white py-20">
         <Tweets />
       </main>
 
       {/* Footer */}
-      <footer className="flex justify-center items-center min-h-[500px] text-white">  
-          <p className="text-xl">Footer</p>
-      </footer>
+      <Footer />
     </div>
   );
 }
