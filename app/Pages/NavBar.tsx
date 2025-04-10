@@ -1,13 +1,23 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Antenna, Blocks, Twitter, LogOut, User, Terminal } from "lucide-react";
+import {
+  Antenna,
+  Blocks,
+  Twitter,
+  LogOut,
+  User,
+  Terminal,
+} from "lucide-react";
 import React, { useEffect, useState, useRef } from "react";
 import { ethers } from "ethers";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+} from "@/components/ui/alert";
 import { useRouter } from "next/navigation";
 import { useWallet } from "../context/WalletContext";
-
 
 declare global {
   interface Window {
@@ -16,17 +26,20 @@ declare global {
 }
 
 function NavBar() {
-  const [Wallet, setWalletAddress] = useState("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [showAlert, setShowAlert] = useState(false); // <-- State for Alert
+  const [showAlert, setShowAlert] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { wallet, setWallet } = useWallet();
+  const router = useRouter();
 
   useEffect(() => {
     checkWalletConnection();
 
-    const handleClickOutside = (event: any) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setIsDropdownOpen(false);
       }
     };
@@ -43,7 +56,7 @@ function NavBar() {
         const provider = new ethers.BrowserProvider(window.ethereum);
         const accounts = await provider.send("eth_accounts", []);
         if (accounts.length > 0) {
-          setWalletAddress(accounts[0]);
+          setWallet(accounts[0]);
         }
       } catch (error) {
         console.log("Error checking wallet connection: ", error);
@@ -56,7 +69,7 @@ function NavBar() {
       try {
         const provider = new ethers.BrowserProvider(window.ethereum);
         const accounts = await provider.send("eth_requestAccounts", []);
-        setWallet(accounts[0]); // Update global state
+        setWallet(accounts[0]);
       } catch (error) {
         console.error("Wallet connection error:", error);
       }
@@ -65,19 +78,17 @@ function NavBar() {
     }
   };
 
-  const Router = useRouter();
-
-  const profilePage = () =>{
-    if(Wallet){
-      Router.push(`/account/${Wallet}`);
+  const profilePage = () => {
+    if (wallet) {
+      router.push(`/account/${wallet}`);
     }
-  }
+  };
 
   const handleLogout = () => {
-    setWalletAddress("");
+    setWallet("");
     setIsDropdownOpen(false);
-    localStorage.removeItem(Wallet); 
-    setShowAlert(true); 
+    localStorage.removeItem(wallet);
+    setShowAlert(true);
     setTimeout(() => {
       setShowAlert(false);
     }, 3000);
@@ -88,7 +99,7 @@ function NavBar() {
   };
 
   return (
-    <nav className="border-b border-border/40 backdrop-blur-sm fixed w-full h-[70px] text-white">
+    <nav className="border-b border-border/40 backdrop-blur-sm fixed w-full h-[70px] text-white z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center justify-between">
         {/* Logo */}
         <div className="flex items-center gap-5">
@@ -96,7 +107,7 @@ function NavBar() {
           <span className="text-2xl">TwitBlock</span>
         </div>
 
-        {/* Connect Wallet and Visit Twitter */}
+        {/* Right Buttons */}
         <div className="flex gap-4">
           <Button
             onClick={() => window.open("https://twitter.com", "_blank")}
@@ -106,21 +117,27 @@ function NavBar() {
             <span>Visit Twitter</span>
           </Button>
 
-          {Wallet ? (
+          {wallet ? (
             <div className="relative" ref={dropdownRef}>
               <Button
                 onClick={toggleDropdown}
                 className="text-xl bg-green-600 text-white cursor-pointer flex items-center"
               >
                 <Antenna className="mr-2 h-4 w-4" />
-                <span>{Wallet.slice(0, 6) + "..." + Wallet.slice(-4)}</span>
+                <span>{wallet.slice(0, 6) + "..." + wallet.slice(-4)}</span>
               </Button>
 
               {isDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none" style={{ zIndex: 50 }}>
+                <div
+                  className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
+                  style={{ zIndex: 50 }}
+                >
                   <div className="py-1 px-2 text-gray-900">
-                    <div className="block px-4 py-2 text-sm border-b">My Account</div>
-                    <button onClick={profilePage}
+                    <div className="block px-4 py-2 text-sm border-b">
+                      My Account
+                    </div>
+                    <button
+                      onClick={profilePage}
                       className="block px-4 py-2 text-sm hover:bg-black hover:text-white hover:rounded-2xl cursor-pointer w-full text-left flex items-center"
                       role="menuitem"
                     >
@@ -140,7 +157,10 @@ function NavBar() {
               )}
             </div>
           ) : (
-            <Button onClick={connectWallet} className="text-xl cursor-pointer flex items-center">
+            <Button
+              onClick={connectWallet}
+              className="text-xl cursor-pointer flex items-center"
+            >
               <Antenna className="mr-2 h-4 w-4" />
               <span>Connect Wallet</span>
             </Button>
@@ -148,7 +168,7 @@ function NavBar() {
         </div>
       </div>
 
-      {/* Show Alert When Logging Out */}
+      {/* Alert Message */}
       {showAlert && (
         <div className="absolute top-16 right-4">
           <Alert>
