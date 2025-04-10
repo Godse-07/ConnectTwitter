@@ -9,7 +9,12 @@ import {
   User,
   Terminal,
 } from "lucide-react";
-import React, { useEffect, useState, useRef } from "react";
+import React, {
+  useEffect,
+  useState,
+  useRef,
+  useCallback,
+} from "react";
 import { ethers } from "ethers";
 import {
   Alert,
@@ -21,7 +26,7 @@ import { useWallet } from "../context/WalletContext";
 
 declare global {
   interface Window {
-    ethereum?: any;
+    ethereum?: unknown;
   }
 }
 
@@ -31,6 +36,20 @@ function NavBar() {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { wallet, setWallet } = useWallet();
   const router = useRouter();
+
+  const checkWalletConnection = useCallback(async () => {
+    if (window.ethereum) {
+      try {
+        const provider = new ethers.BrowserProvider(window.ethereum as any);
+        const accounts = await provider.send("eth_accounts", []);
+        if (accounts.length > 0) {
+          setWallet(accounts[0]);
+        }
+      } catch (error) {
+        console.log("Error checking wallet connection: ", error);
+      }
+    }
+  }, [setWallet]);
 
   useEffect(() => {
     checkWalletConnection();
@@ -48,26 +67,12 @@ function NavBar() {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, []);
-
-  const checkWalletConnection = async () => {
-    if (window.ethereum) {
-      try {
-        const provider = new ethers.BrowserProvider(window.ethereum);
-        const accounts = await provider.send("eth_accounts", []);
-        if (accounts.length > 0) {
-          setWallet(accounts[0]);
-        }
-      } catch (error) {
-        console.log("Error checking wallet connection: ", error);
-      }
-    }
-  };
+  }, [checkWalletConnection]);
 
   const connectWallet = async () => {
     if (window.ethereum) {
       try {
-        const provider = new ethers.BrowserProvider(window.ethereum);
+        const provider = new ethers.BrowserProvider(window.ethereum as any);
         const accounts = await provider.send("eth_requestAccounts", []);
         setWallet(accounts[0]);
       } catch (error) {
